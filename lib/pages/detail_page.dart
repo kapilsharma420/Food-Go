@@ -12,6 +12,16 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  int quantity = 1;
+  int totalprice = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    totalprice = int.parse(widget.price);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,15 +76,15 @@ class _DetailPageState extends State<DetailPage> {
             ),
             Center(
               child: Text(
-                widget.price,
+                '₹' + widget.price,
                 style: AppWidget.price_textfield_style(),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.only(right: 13),
               child: Text(
-                " A cheesy and colorful veg pizza loaded with fresh veggies like capsicum, tomato, and onion. The crispy crust and melting cheese make it super tasty. Generously layered with mozzarella cheese, it sits on a soft, golden-baked crust and tomato sauce. It's perfect bite for pizza lover! ",
+                " Enjoy the perfect blend of taste and quality with every bite. Prepared fresh with premium ingredients to satisfy your cravings. Ideal for quick snacks or hearty meals, this delicious treat brings flavor and comfort together. A must-try for food lovers!",
                 style: AppWidget.onboarding_simple_textstyle(),
               ),
             ),
@@ -83,33 +93,54 @@ class _DetailPageState extends State<DetailPage> {
             SizedBox(height: 5),
             Row(
               children: [
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppWidget.primary_red_color(),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      quantity = quantity + 1;
+                      totalprice = totalprice + int.parse(widget.price);
+                    });
+                  },
+                  child: Material(
+                    elevation: 3,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppWidget.primary_red_color(),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
 
-                    child: Icon(Icons.add, color: Colors.white, size: 30),
+                      child: Icon(Icons.add, color: Colors.white, size: 30),
+                    ),
                   ),
                 ),
                 SizedBox(width: 20),
-                Text('1', style: AppWidget.onboarding_heading_textstyle()),
+                Text(
+                  '$quantity',
+                  style: AppWidget.onboarding_heading_textstyle(),
+                ),
                 SizedBox(width: 20),
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppWidget.primary_red_color(),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (quantity > 1) {
+                        quantity = quantity - 1;
+                        totalprice = totalprice - int.parse(widget.price);
+                      }
+                    });
+                  },
+                  child: Material(
+                    elevation: 3,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppWidget.primary_red_color(),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
 
-                    child: Icon(Icons.remove, color: Colors.white, size: 30),
+                      child: Icon(Icons.remove, color: Colors.white, size: 30),
+                    ),
                   ),
                 ),
               ],
@@ -130,7 +161,7 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                     child: Center(
                       child: Text(
-                        widget.price,
+                        "₹" + totalprice.toString(),
                         style: AppWidget.bold_white_textfield_style(),
                       ),
                     ),

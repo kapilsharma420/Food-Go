@@ -86,9 +86,9 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      'images/hot_bite_logo.png',
+                      'images/name_logo.png',
                       height: 50,
-                      width: 135,
+                      width: 100,
                       fit: BoxFit.contain,
                     ),
                     Text(
@@ -377,7 +377,7 @@ class _HomePageState extends State<HomePage> {
               style: AppWidget.bold_textfield_style(),
             ),
           ),
-          Center(child: Text(price, style: AppWidget.price_textfield_style())),
+          Center(child: Text( '₹'+price, style: AppWidget.price_textfield_style())),
           Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,

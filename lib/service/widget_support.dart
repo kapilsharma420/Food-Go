@@ -48,6 +48,14 @@ class AppWidget {
       fontWeight: FontWeight.bold,
     );
   }
+  
+  static TextStyle form_text_style() {
+    return TextStyle(
+      fontSize: 16,
+      color: Colors.grey,
+      
+    );
+  }
 
   // main colors
 
@@ -55,5 +63,8 @@ class AppWidget {
     return Color(0xffef2b39);
   }
 
-  
+   static Color form_yellow_color() {
+    return  Color(0xffffefbf);
+  }
+
 }

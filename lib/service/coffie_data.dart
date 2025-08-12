@@ -5,31 +5,31 @@ List<CoffieModel> getCoffies() {
 
   CoffieModel model = CoffieModel();
   model.name = 'Espresso';
-  model.price = '₹80';
+  model.price = '80';
   model.image = 'images/espresso.jpeg';
   coffieCategories.add(model);
 
   model = CoffieModel();
   model.name = 'Cappuccino';
-  model.price = '₹100';
+  model.price = '100';
   model.image = 'images/cappuccino.jpg';
   coffieCategories.add(model);
 
   model = CoffieModel();
   model.name = 'Latte';
-  model.price = '₹90';
+  model.price = '90';
   model.image = 'images/latte.jpg';
   coffieCategories.add(model);
 
   model = CoffieModel();
   model.name = 'Cold Coffee';
-  model.price = '₹110';
+  model.price = '110';
   model.image = 'images/coldcoffie.jpg';
   coffieCategories.add(model);
 
   model = CoffieModel();
   model.name = 'Filter Coffee';
-  model.price = '₹70';
+  model.price = '70';
   model.image = 'images/filtercoffie.webp';
   coffieCategories.add(model);
 

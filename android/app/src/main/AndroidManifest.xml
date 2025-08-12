@@ -2,7 +2,7 @@
 <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="hot_bite"
+        android:label="Food Go"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

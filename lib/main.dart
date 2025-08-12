@@ -4,6 +4,7 @@ import 'package:hot_bite/pages/bottomnav.dart';
 import 'package:hot_bite/pages/detail_page.dart';
 import 'package:hot_bite/pages/home.dart';
 import 'package:hot_bite/pages/onboarding.dart';
+import 'package:hot_bite/pages/signup.dart';
 import 'package:hot_bite/pages/splashscreen.dart';
 
 void main() {
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
         
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BottomNav()
+      home: SignupPage()
+    
     );
   }
 }
