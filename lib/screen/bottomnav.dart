@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hot_bite/screen/home.dart';
 import 'package:hot_bite/screen/order.dart';
 import 'package:hot_bite/screen/profile.dart';
@@ -22,6 +23,10 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      //overlays: [SystemUiOverlay.bottom],
+    );
     // TODO: implement initState
     super.initState();
     home = HomePage();
@@ -34,24 +39,27 @@ class _BottomNavState extends State<BottomNav> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: CurvedNavigationBar(
-        height: 50,
-        backgroundColor: Colors.white,
-        color: const Color.fromARGB(255, 231, 135, 135),
-        animationDuration: Duration(milliseconds: 300),
-
-        items: [
-          Icon(Icons.home, size: 25, color: Colors.black54),
-          Icon(Icons.shopping_bag, size: 25, color: Colors.black54),
-          Icon(Icons.wallet, size: 25, color: Colors.black54),
-          Icon(Icons.person, size: 25, color: Colors.black54),
-        ],
-        onTap: (index) {
-         
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
+      extendBody: true,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 0.0),
+        child: CurvedNavigationBar(
+          height: 60,
+          backgroundColor: Colors.transparent,
+          color: const Color.fromARGB(255, 231, 135, 135),
+          animationDuration: Duration(milliseconds: 300),
+    
+          items: [
+            Icon(Icons.home, size: 25, color: Colors.black54),
+            Icon(Icons.shopping_bag, size: 25, color: Colors.black54),
+            Icon(Icons.wallet, size: 25, color: Colors.black54),
+            Icon(Icons.person, size: 25, color: Colors.black54),
+          ],
+          onTap: (index) {
+            setState(() {
+              currentPageIndex = index;
+            });
+          },
+        ),
       ),
       body: pages[currentPageIndex],
     );

@@ -32,7 +32,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
         Get.snackbar(
           "Success",
-          "Password reset link sent! Please check your email.",
+          "If an account with this email exists, a reset link has been sent.",
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,

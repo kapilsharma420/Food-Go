@@ -6,7 +6,7 @@ class SharedPrefHelper {
   static String userEmailKey = 'USEREMAILKEY';
   static String userImageKey = 'USERIMAGEKEY';
 
-  // ---------------- SAVE METHODS ----------------
+  // ---------------- SAVE METHODS / set methods ----------------
   Future<bool> saveUserId(String userId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(userIdKey, userId);

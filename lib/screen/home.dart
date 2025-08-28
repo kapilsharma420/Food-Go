@@ -41,15 +41,14 @@ class _HomePageState extends State<HomePage> {
   List<CoffieModel> coffie_categories = [];
   String trackindex = '0';
 
-
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.edgeToEdge,
-        overlays: [SystemUiOverlay.bottom],
+        SystemUiMode.immersiveSticky,
+        //overlays: [SystemUiOverlay.bottom],
       );
 
       SystemChrome.setSystemUIOverlayStyle(
@@ -343,7 +342,7 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
           ],
         ),
       ),

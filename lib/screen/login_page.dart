@@ -1,118 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hot_bite/controller/logincontroller.dart';
 import 'package:hot_bite/screen/forgotpassword.dart';
-import 'package:hot_bite/screen/home.dart';
 import 'package:hot_bite/screen/signup.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
-import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatelessWidget {
+  LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  final FocusNode _emailFocus = FocusNode();
-  final FocusNode _passwordFocus = FocusNode();
-
-  bool _obscurePassword = true;
-
-  //login function used in login button
-  Future<void> loginWithFirebase() async {
-    if (_formKey.currentState!.validate()) {
-      FocusScope.of(context).unfocus();
-
-      // Loading indicator
-      Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.white,strokeWidth: 1,)),
-        barrierDismissible: false,
-      );
-
-      try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        ); 
-
-        Get.back(); // close loading
-
-        Get.snackbar(
-          "Success",
-          "Login Successful!",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-       
-        // यहाँ पर तुम्हें HomePage या Dashboard पर navigate करना चाहिए
-        // Example:
-         Get.offAll(() => const HomePage());
-      } on FirebaseAuthException catch (e) {
-        Get.back(); // close loading
-
-        String errorMessage;
-        if (e.code == 'user-not-found') {
-          errorMessage = 'No user found for that email.';
-        } else if (e.code == 'wrong-password') {
-          errorMessage = 'Wrong password provided.';
-        } else if (e.code == 'invalid-email') {
-          errorMessage = 'Invalid email address.';
-        } else {
-          errorMessage = e.message ?? 'Login failed.';
-        }
-
-        Get.snackbar(
-          "Error",
-          errorMessage,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // notch area transparent
-        systemNavigationBarColor: Colors.white12, // bottom nav bar transparent
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
-    super.dispose();
-  }
+  final LoginController controller = Get.put(LoginController());
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      FocusScope.of(context).unfocus();
-      Get.snackbar(
-        "Success",
-        "Login Successful!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+    if (controller.formKey.currentState!.validate()) {
+      FocusScope.of(Get.context!).unfocus();
+      controller.loginWithFirebase();
     }
   }
 
@@ -120,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(), // dismiss keyboard
+        onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -156,7 +58,6 @@ class _LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 5),
 
-              /// Page Title
               Text(
                 "LogIn",
                 style: TextStyle(
@@ -170,23 +71,23 @@ class _LoginPageState extends State<LoginPage> {
                 "Welcome back! Please login to continue",
                 style: AppWidget.form_text_style(),
               ),
-
               const SizedBox(height: 20),
 
               /// Login Form
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Form(
-                  key: _formKey,
+                  key: controller.formKey,
                   child: Column(
                     children: [
                       /// Email
                       TextFormField(
-                        controller: _emailController,
-                        focusNode: _emailFocus,
+                        controller: controller.emailController,
+                        focusNode: controller.emailFocus,
                         textInputAction: TextInputAction.next,
                         onFieldSubmitted: (_) {
-                          FocusScope.of(context).requestFocus(_passwordFocus);
+                          FocusScope.of(context)
+                              .requestFocus(controller.passwordFocus);
                         },
                         decoration: InputDecoration(
                           labelText: "Email",
@@ -209,45 +110,44 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 15),
 
                       /// Password
-                      TextFormField(
-                        controller: _passwordController,
-                        focusNode: _passwordFocus,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submitForm(),
-                        obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: "Password",
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
+                      Obx(() => TextFormField(
+                            controller: controller.passwordController,
+                            focusNode: controller.passwordFocus,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _submitForm(),
+                            obscureText: controller.obscurePassword.value,
+                            decoration: InputDecoration(
+                              labelText: "Password",
+                              prefixIcon: const Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  controller.obscurePassword.value
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () {
+                                  controller.obscurePassword.value =
+                                      !controller.obscurePassword.value;
+                                },
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Please enter your password";
+                              }
+                              return null;
                             },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your password";
-                          }
-                          return null;
-                        },
-                      ),
+                          )),
 
-                      /// Forgot Password 
+                      /// Forgot Password
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            Get.to(() =>  ForgotPasswordPage());
+                            Get.to(() => ForgotPasswordPage());
                           },
                           child: const Text(
                             "Forgot Password?",
@@ -270,9 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: () {
-                            loginWithFirebase();
-                          },
+                          onPressed: () => controller.loginWithFirebase(),
                           child: const Text(
                             "Login",
                             style: TextStyle(
@@ -291,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Text("Don't have an account? "),
                           GestureDetector(
-                            onTap: () => Get.offAll(const SignupPage()),
+                            onTap: () => Get.offAll(SignupPage()),
                             child: const Text(
                               "SignUp",
                               style: TextStyle(
