@@ -10,7 +10,7 @@ import 'package:hot_bite/model/momo_model.dart';
 import 'package:hot_bite/model/noodles_model.dart';
 import 'package:hot_bite/model/pizza_model.dart';
 import 'package:hot_bite/model/soup_model.dart';
-import 'package:hot_bite/pages/detail_page.dart';
+import 'package:hot_bite/screen/detail_page.dart';
 import 'package:hot_bite/service/burger_data.dart';
 import 'package:hot_bite/service/category_data.dart';
 import 'package:hot_bite/service/chaap_data.dart';
@@ -41,10 +41,28 @@ class _HomePageState extends State<HomePage> {
   List<CoffieModel> coffie_categories = [];
   String trackindex = '0';
 
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.edgeToEdge,
+        overlays: [SystemUiOverlay.bottom],
+      );
+
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              Brightness.dark, // ya dark depending on background
+          systemNavigationBarColor: Colors.grey[100],
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
+    });
+
     categories = getCategories();
     pizza_categories = getPizza();
     burger_categories = getBurger();
@@ -54,20 +72,6 @@ class _HomePageState extends State<HomePage> {
     chaap_categories = getChaap();
     soup_categories = getSoups();
     coffie_categories = getCoffies();
-
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      
-    );
-
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // Allows content under notch
-        statusBarIconBrightness: Brightness.dark, // Icons color
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-    );
   }
 
   @override
@@ -75,7 +79,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.only(left: 20, top: 40),
+        margin: EdgeInsets.only(left: 20, top: 40, bottom: 50),
         child: Column(
           children: [
             // app name image , text and user image
@@ -377,13 +381,18 @@ class _HomePageState extends State<HomePage> {
               style: AppWidget.bold_textfield_style(),
             ),
           ),
-          Center(child: Text( '₹'+price, style: AppWidget.price_textfield_style())),
+          Center(
+            child: Text('₹' + price, style: AppWidget.price_textfield_style()),
+          ),
           Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               GestureDetector(
-                onTap: () => Get.to(DetailPage(image: image,name: name,price: price,)),
+                onTap:
+                    () => Get.to(
+                      DetailPage(image: image, name: name, price: price),
+                    ),
                 child: Container(
                   height: 50,
                   width: 80,
@@ -394,7 +403,11 @@ class _HomePageState extends State<HomePage> {
                       bottomRight: Radius.circular(20),
                     ),
                   ),
-                  child: Icon(Icons.arrow_forward, color: Colors.white, size: 30),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
               ),
             ],

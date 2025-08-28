@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:hot_bite/pages/onboarding.dart';
+import 'package:hot_bite/screen/onboarding.dart';
 import 'package:lottie/lottie.dart';
 
 class Splashscreen extends StatefulWidget {

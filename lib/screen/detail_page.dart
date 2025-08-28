@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hot_bite/pages/home.dart';
+import 'package:hot_bite/screen/home.dart';
 import 'package:hot_bite/service/widget_support.dart';
 
 class DetailPage extends StatefulWidget {

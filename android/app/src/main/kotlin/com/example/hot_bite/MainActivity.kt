@@ -1,4 +1,4 @@
-package com.example.hot_bite
+package com.example.food_go
 
 import io.flutter.embedding.android.FlutterActivity
 

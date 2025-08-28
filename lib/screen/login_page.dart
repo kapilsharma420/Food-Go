@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:hot_bite/pages/signup.dart';
+import 'package:hot_bite/screen/forgotpassword.dart';
+import 'package:hot_bite/screen/home.dart';
+import 'package:hot_bite/screen/signup.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,10 +26,72 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _obscurePassword = true;
 
+  //login function used in login button
+  Future<void> loginWithFirebase() async {
+    if (_formKey.currentState!.validate()) {
+      FocusScope.of(context).unfocus();
+
+      // Loading indicator
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.white,strokeWidth: 1,)),
+        barrierDismissible: false,
+      );
+
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ); 
+
+        Get.back(); // close loading
+
+        Get.snackbar(
+          "Success",
+          "Login Successful!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+       
+        // यहाँ पर तुम्हें HomePage या Dashboard पर navigate करना चाहिए
+        // Example:
+         Get.offAll(() => const HomePage());
+      } on FirebaseAuthException catch (e) {
+        Get.back(); // close loading
+
+        String errorMessage;
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Wrong password provided.';
+        } else if (e.code == 'invalid-email') {
+          errorMessage = 'Invalid email address.';
+        } else {
+          errorMessage = e.message ?? 'Login failed.';
+        }
+
+        Get.snackbar(
+          "Error",
+          errorMessage,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // notch area transparent
+        systemNavigationBarColor: Colors.white12, // bottom nav bar transparent
+      ),
+    );
   }
 
   @override
@@ -59,7 +124,6 @@ class _LoginPageState extends State<LoginPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              
               /// Top Header
               Container(
                 height: Get.height / 3.5,
@@ -178,18 +242,12 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
 
-                      /// Forgot Password Link
+                      /// Forgot Password 
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            Get.snackbar(
-                              "Forgot Password",
-                              "Navigate to password reset screen",
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.orange,
-                              colorText: Colors.white,
-                            );
+                            Get.to(() =>  ForgotPasswordPage());
                           },
                           child: const Text(
                             "Forgot Password?",
@@ -212,7 +270,9 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          onPressed: _submitForm,
+                          onPressed: () {
+                            loginWithFirebase();
+                          },
                           child: const Text(
                             "Login",
                             style: TextStyle(
@@ -231,7 +291,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Text("Don't have an account? "),
                           GestureDetector(
-                            onTap: () => Get.to(const SignupPage()),
+                            onTap: () => Get.offAll(const SignupPage()),
                             child: const Text(
                               "SignUp",
                               style: TextStyle(
