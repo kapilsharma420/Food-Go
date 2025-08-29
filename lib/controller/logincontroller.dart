@@ -31,15 +31,15 @@ class LoginController extends GetxController {
       Get.snackbar(
         "Success",
         "Login Successful!",
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 1),
         margin: const EdgeInsets.all(12),
       );
 
       // Navigate after short delay
-      Future.delayed(const Duration(milliseconds: 500), () {
+      Future.delayed(const Duration(milliseconds: 300), () {
         Get.offAll(() => const BottomNav());
       });
 
