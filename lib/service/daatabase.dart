@@ -7,4 +7,20 @@ class Database {
         .doc(id)
         .set(userInfoMap);
   }
+  Future addUserOrderDetails(Map<String, dynamic> userOrderMap, String id,String orderId) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .collection('orders')
+        .doc(orderId)
+        .set(userOrderMap);
+  }
+
+    Future addAdminOrderDetails(Map<String, dynamic> userOrderMap,String orderId) async {
+    return await FirebaseFirestore.instance
+       
+        .collection('orders')
+        .doc(orderId)
+        .set(userOrderMap);
+  }
 }

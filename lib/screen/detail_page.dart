@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hot_bite/screen/home.dart';
+import 'package:hot_bite/service/daatabase.dart';
+import 'package:hot_bite/service/share_pref.dart';
 import 'package:hot_bite/service/widget_support.dart';
+import 'package:random_string/random_string.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class DetailPage extends StatefulWidget {
   String image, name, price;
@@ -14,16 +17,49 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   int quantity = 1;
   int totalprice = 0;
+  Razorpay _razorpay = Razorpay();
+
+  String? name, id,email;
+  //
+
+  getthesharedprefrence() async {
+
+    //local saved data ko get kerne k liye 
+    name = await SharedPrefHelper().getUserEmail();
+    id = await SharedPrefHelper().getUserId();
+    email = await SharedPrefHelper().getUserEmail();
+    setState(() {
+      
+    });
+  }
+
+  var options = {
+    'key':
+        'rzp_test_RB3FEePW83UaOV', // Enter the Key ID generated from the Dashboard
+    'amount': 0,
+    'currency': 'INR',
+    'name': "kapil's FoodGo",
+    'description': 'Delicious food delivered to your doorstep',
+    'prefill': {'contact': '0000000000', 'email': 'test@razorpay.com'},
+  };
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getthesharedprefrence();
     totalprice = int.parse(widget.price);
+    options['amount'] = totalprice * 100; // paise me set
+
+      // Yeh listeners sirf ek hi baar lagane hain
+  _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+  _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+  _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   Widget build(BuildContext context) {
+  
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 35, left: 20),
@@ -98,6 +134,8 @@ class _DetailPageState extends State<DetailPage> {
                     setState(() {
                       quantity = quantity + 1;
                       totalprice = totalprice + int.parse(widget.price);
+                      options['amount'] =
+                          totalprice * 100; // Razorpay me paise me dalna
                     });
                   },
                   child: Material(
@@ -126,6 +164,8 @@ class _DetailPageState extends State<DetailPage> {
                       if (quantity > 1) {
                         quantity = quantity - 1;
                         totalprice = totalprice - int.parse(widget.price);
+                        options['amount'] =
+                            totalprice * 100; // Razorpay me paise me dalna
                       }
                     });
                   },
@@ -168,20 +208,24 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
                 SizedBox(width: 30),
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    height: 60,
-                    width: 175,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'ORDER NOW',
-                        style: AppWidget.white_text_field_style(),
+                GestureDetector(
+                  // handle order now here
+                  onTap: () => _razorpay.open(options),
+                  child: Material(
+                    elevation: 3,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      height: 60,
+                      width: 175,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'ORDER NOW',
+                          style: AppWidget.white_text_field_style(),
+                        ),
                       ),
                     ),
                   ),
@@ -193,4 +237,159 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async{
+    String orderid = randomAlphaNumeric(10);
+    // Do something when payment succeeds
+   
+    Map<String, dynamic> userOrderMap = {
+
+      "name": name,
+      "id": id,
+      "quantity": quantity.toString(),
+      "email": email,
+      "total_price": totalprice.toString(),
+      "foodName":widget.name,
+      "image":widget.image,
+      "status":"pending",
+      "order_id": orderid,
+    };
+
+    await Database().addUserOrderDetails(userOrderMap, id!, orderid);
+    await Database().addAdminOrderDetails(userOrderMap, orderid);
+
+     Get.snackbar(
+      "Success",
+      "Order Successful!",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+    );
+
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+    Get.snackbar(
+      "Error",
+      "Payment Failed!",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(12),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+    Get.snackbar(
+      "Info",
+      "External Wallet Selected!",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.blue,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 1),
+      margin: const EdgeInsets.all(12),
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _razorpay.clear(); // Removes all listeners
+  }
 }
+
+  // //for payment gateway integration
+
+  // Future<void> makepayment(String amount) async {
+  //   try {
+  //     //payment process
+
+  //     PaymentIntent paymentIntent = await createPaymentIntent(amount, 'INR');
+  //     await Stripe.instance
+  //         .initPaymentSheet(
+  //           paymentSheetParameters: SetupPaymentSheetParameters(
+  //             paymentIntentClientSecret: paymentIntent.clientSecret,
+  //             style: ThemeMode.dark,
+  //             merchantDisplayName: "kapil's FoodGo",
+  //           ),
+  //         )
+  //         .then((Value) {
+  //           // Handle successful payment sheet initialization
+  //         });
+  //     displayPaymentSheet(amount);
+  //   } catch (e, s) {
+  //     print('exception: $e $s');
+  //   }
+  // }
+
+  // displayPaymentSheet(String amount) async {
+  //   try {
+  //     await Stripe.instance
+  //         .presentPaymentSheet()
+  //         .then((value) async {
+  //           // Handle successful payment
+
+  //           showDialog(
+  //             context: context,
+  //             builder: (BuildContext context) {
+  //               return AlertDialog(
+  //                 title: Text("Payment Successful"),
+  //                 content: Text("Your payment of $amount was successful."),
+  //                 actions: [
+  //                   TextButton(
+  //                     onPressed: () {
+  //                       Navigator.of(context).pop();
+  //                     },
+  //                     child: Text("OK"),
+  //                   ),
+  //                 ],
+  //               );
+  //             },
+  //           );
+  //         })
+  //         .catchError((error) {
+  //           // Handle payment error
+  //           print('Error during payment: $error');
+  //         });
+  //   } on StripeException catch (e, s) {
+  //     print('exception: $e $s');
+  //     showDialog(
+  //       context: context,
+  //       builder: (_) => AlertDialog(content: Text("Payment cancelled")),
+  //     );
+  //   } catch (e, s) {
+  //     print('$e $s');
+  //   }
+  // }
+
+  // createPaymentIntent(String amount, String currency) async {
+  //   try {
+  //     // Create a payment intent
+
+  //     Map<String, dynamic> body = {
+  //       'amount': calculateAmount(amount) ,
+  //       'currency': currency,
+  //       'payment_method_types[]': 'card'
+  //     };
+  //     //call the api to create payment intent on server
+  //     var response=await http.post(
+  //       Uri.parse('https://your-server.com/create-payment-intent'),
+  //       headers: {
+  //         'Authorization': 'Bearer YOUR_SECRET_KEY',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: body,
+  //     );
+  //     return jsonDecode(response.body);
+
+  //   } catch (err) {
+  //     print('exception: ${err.toString()}');
+  //     return null;
+  //   }
+  // }

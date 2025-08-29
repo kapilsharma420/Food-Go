@@ -37,11 +37,11 @@ class SignupController extends GetxController {
 
     try {
       // Firebase create user
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
       String id = randomAlphaNumeric(10);
 
@@ -54,6 +54,7 @@ class SignupController extends GetxController {
       await SharedPrefHelper().saveUserEmail(emailController.text.trim());
       await SharedPrefHelper().saveUserName(nameController.text.trim());
       await Database().addUserDetails(userInfoMap, id);
+      await SharedPrefHelper().saveUserId(id);
 
       // ✅ Success snackbar
       Get.snackbar(
@@ -65,9 +66,9 @@ class SignupController extends GetxController {
         duration: const Duration(seconds: 2),
       );
 
+      unfocusAll();
       // Navigate to login page
       Get.offAll(() => LoginPage());
-
     } on FirebaseAuthException catch (e) {
       String errorMessage;
 

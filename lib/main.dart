@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hot_bite/screen/bottomnav.dart';
+import 'package:hot_bite/screen/detail_page.dart';
 import 'package:hot_bite/screen/home.dart';
 import 'package:hot_bite/screen/signup.dart';
 
