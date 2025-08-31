@@ -30,9 +30,9 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Razorpay _razorpay = Razorpay();
+  int selectedAmount = 0; // Track which amount is selected
   var options = {
-    'key':
-        'rzp_test_RB3FEePW83UaOV', 
+    'key': 'rzp_test_RB3FEePW83UaOV',
     'amount': 0,
     'currency': 'INR',
     'name': "kapil's FoodGo",
@@ -50,6 +50,42 @@ class _WalletPageState extends State<WalletPage> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  // 🔹 Reusable function for amount box
+  Widget buildAmountBox(int amount) {
+    bool isSelected = selectedAmount == amount;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedAmount = amount;
+          options['amount'] = amount * 100; // Razorpay me paise me set
+        });
+      },
+      child: Container(
+        width: 100,
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? Colors.red : Colors.grey,
+            width: 2,
+          ),
+          color: isSelected ? Colors.red[50] : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Text(
+            '₹$amount',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.red : Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -124,79 +160,9 @@ class _WalletPageState extends State<WalletPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          GestureDetector(
-                            onTap:
-                                () => setState(() {
-                                  options['amount'] = 100 * 100; // paise me set
-                                }),
-                            child: Container(
-                              width: 100,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 1,
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '₹100',
-                                  style: AppWidget.price_textfield_style(),
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap:
-                                () => setState(() {
-                                  options['amount'] = 500 * 100; // paise me set
-                                }),
-                            child: Container(
-                              width: 100,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 1,
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '₹500',
-                                  style: AppWidget.price_textfield_style(),
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap:
-                                () => setState(() {
-                                  options['amount'] =
-                                      1000 * 100; // paise me set
-                                }),
-                            child: Container(
-                              width: 100,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 1,
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '₹1000',
-                                  style: AppWidget.price_textfield_style(),
-                                ),
-                              ),
-                            ),
-                          ),
+                          buildAmountBox(100),
+                          buildAmountBox(500),
+                          buildAmountBox(1000),
                         ],
                       ),
                     ),
