@@ -5,7 +5,10 @@ import 'package:get/get.dart';
 import 'package:hot_bite/screen/bottomnav.dart';
 import 'package:hot_bite/screen/detail_page.dart';
 import 'package:hot_bite/screen/home.dart';
+import 'package:hot_bite/screen/order.dart';
 import 'package:hot_bite/screen/signup.dart';
+import 'package:hot_bite/screen/splashscreen.dart';
+import 'package:hot_bite/screen/wallet.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +41,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true, // better edge-to-edge rendering
         // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SignupPage()
+      home:WalletPage()
     );
   }
 }

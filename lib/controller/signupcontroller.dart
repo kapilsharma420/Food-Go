@@ -49,6 +49,7 @@ class SignupController extends GetxController {
         "Id": id,
         "Name": nameController.text.trim(),
         "Email": emailController.text.trim(),
+        'Wallet':'0',
       };
 
       await SharedPrefHelper().saveUserEmail(emailController.text.trim());

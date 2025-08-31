@@ -19,15 +19,17 @@ class _DetailPageState extends State<DetailPage> {
   int totalprice = 0;
   Razorpay _razorpay = Razorpay();
 
-  String? name, id,email;
-  //
+ 
+  TextEditingController addresscontroller = TextEditingController();
 
+ String? name, id,email;
   getthesharedprefrence() async {
 
     //local saved data ko get kerne k liye 
     name = await SharedPrefHelper().getUserEmail();
     id = await SharedPrefHelper().getUserId();
     email = await SharedPrefHelper().getUserEmail();
+    addresscontroller.text = await SharedPrefHelper().getUserAddress() ?? '';
     setState(() {
       
     });
@@ -61,178 +63,188 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
   
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.only(top: 35, left: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppWidget.primary_red_color(),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back, color: Colors.white),
-              ),
-            ),
-
-            Center(
-              child: Container(
-                margin: EdgeInsets.only(top: 30, left: 8, right: 15),
-                width: Get.height * 0.8,
-                height: Get.width * 0.6,
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.only(top: 35, left: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(60),
-                  shape: BoxShape.rectangle,
-                  border: Border.all(color: Colors.orange, width: 1),
-                  image: DecorationImage(
-                    image: AssetImage(widget.image),
-                    fit: BoxFit.fill,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
+                  color: AppWidget.primary_red_color(),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-              ),
-            ),
-            SizedBox(height: 10),
-            Center(
-              child: Text(
-                widget.name,
-                style: AppWidget.onboarding_heading_textstyle(),
-              ),
-            ),
-            Center(
-              child: Text(
-                '₹' + widget.price,
-                style: AppWidget.price_textfield_style(),
-              ),
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.only(right: 13),
-              child: Text(
-                " Enjoy the perfect blend of taste and quality with every bite. Prepared fresh with premium ingredients to satisfy your cravings. Ideal for quick snacks or hearty meals, this delicious treat brings flavor and comfort together. A must-try for food lovers!",
-                style: AppWidget.onboarding_simple_textstyle(),
-              ),
-            ),
-            SizedBox(height: 25),
-            Text('Quantity', style: AppWidget.onboarding_simple_textstyle()),
-            SizedBox(height: 5),
-            Row(
-              children: [
-                GestureDetector(
+                child: GestureDetector(
                   onTap: () {
-                    setState(() {
-                      quantity = quantity + 1;
-                      totalprice = totalprice + int.parse(widget.price);
-                      options['amount'] =
-                          totalprice * 100; // Razorpay me paise me dalna
-                    });
+                    Navigator.pop(context);
                   },
-                  child: Material(
-                    elevation: 3,
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppWidget.primary_red_color(),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-
-                      child: Icon(Icons.add, color: Colors.white, size: 30),
+                  child: Icon(Icons.arrow_back, color: Colors.white),
+                ),
+              ),
+        
+              Center(
+                child: Container(
+                  margin: EdgeInsets.only(top: 30, left: 8, right: 15),
+                  width: Get.height * 0.8,
+                  height: Get.width * 0.6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(60),
+                    shape: BoxShape.rectangle,
+                    border: Border.all(color: Colors.orange, width: 1),
+                    image: DecorationImage(
+                      image: AssetImage(widget.image),
+                      fit: BoxFit.fill,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(width: 20),
-                Text(
-                  '$quantity',
+              ),
+              SizedBox(height: 10),
+              Center(
+                child: Text(
+                  widget.name,
                   style: AppWidget.onboarding_heading_textstyle(),
                 ),
-                SizedBox(width: 20),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (quantity > 1) {
-                        quantity = quantity - 1;
-                        totalprice = totalprice - int.parse(widget.price);
+              ),
+              Center(
+                child: Text(
+                  '₹' + widget.price,
+                  style: AppWidget.price_textfield_style(),
+                ),
+              ),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.only(right: 13),
+                child: Text(
+                  " Enjoy the perfect blend of taste and quality with every bite. Prepared fresh with premium ingredients to satisfy your cravings. Ideal for quick snacks or hearty meals, this delicious treat brings flavor and comfort together. A must-try for food lovers!",
+                  style: AppWidget.onboarding_simple_textstyle(),
+                ),
+              ),
+              SizedBox(height: 25),
+              Text('Quantity', style: AppWidget.onboarding_simple_textstyle()),
+              SizedBox(height: 5),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        quantity = quantity + 1;
+                        totalprice = totalprice + int.parse(widget.price);
                         options['amount'] =
                             totalprice * 100; // Razorpay me paise me dalna
-                      }
-                    });
-                  },
-                  child: Material(
-                    elevation: 3,
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppWidget.primary_red_color(),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-
-                      child: Icon(Icons.remove, color: Colors.white, size: 30),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Material(
-                  elevation: 3,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    height: 60,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: AppWidget.primary_red_color(),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "₹" + totalprice.toString(),
-                        style: AppWidget.bold_white_textfield_style(),
+                      });
+                    },
+                    child: Material(
+                      elevation: 3,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppWidget.primary_red_color(),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+        
+                        child: Icon(Icons.add, color: Colors.white, size: 30),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 30),
-                GestureDetector(
-                  // handle order now here
-                  onTap: () => _razorpay.open(options),
-                  child: Material(
+                  SizedBox(width: 20),
+                  Text(
+                    '$quantity',
+                    style: AppWidget.onboarding_heading_textstyle(),
+                  ),
+                  SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (quantity > 1) {
+                          quantity = quantity - 1;
+                          totalprice = totalprice - int.parse(widget.price);
+                          options['amount'] =
+                              totalprice * 100; // Razorpay me paise me dalna
+                        }
+                      });
+                    },
+                    child: Material(
+                      elevation: 3,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppWidget.primary_red_color(),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+        
+                        child: Icon(Icons.remove, color: Colors.white, size: 30),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Material(
                     elevation: 3,
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
                       height: 60,
-                      width: 175,
+                      width: 120,
                       decoration: BoxDecoration(
-                        color: Colors.black,
+                        color: AppWidget.primary_red_color(),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
                         child: Text(
-                          'ORDER NOW',
-                          style: AppWidget.white_text_field_style(),
+                          "₹" + totalprice.toString(),
+                          style: AppWidget.bold_white_textfield_style(),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  SizedBox(width: 30),
+                  GestureDetector(
+                    // handle order now here
+                    onTap: () {
+                      if (addresscontroller.text == null || addresscontroller.text.isEmpty) {
+                        openBox();
+                      } else{
+                        //direct payment page pe chala jayega
+                        _razorpay.open(options);
+                      }
+                    },
+        
+                    child: Material(
+                      elevation: 3,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        height: 60,
+                        width: 175,
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'ORDER NOW',
+                            style: AppWidget.white_text_field_style(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -252,7 +264,8 @@ class _DetailPageState extends State<DetailPage> {
       "foodName":widget.name,
       "image":widget.image,
       "status":"pending",
-      "order_id": orderid,
+      "order_id": orderid, 
+      "address": addresscontroller.text,
     };
 
     await Database().addUserOrderDetails(userOrderMap, id!, orderid);
@@ -296,6 +309,90 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  //address dialoge
+
+  Future openBox()=> showDialog(context: context, builder: (context)=>
+  AlertDialog(
+  
+   
+    content: SingleChildScrollView(
+      child: Container(
+        child: Column(
+         
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(Icons.cancel),
+                ),
+                SizedBox(width: 30),
+                Text('Add the Address',style: TextStyle(
+                  color: Color(0xff008080),fontWeight: FontWeight.bold,fontSize: 18
+                ),),
+           
+
+
+                
+              ],
+            ),
+            SizedBox(height: 20,),
+            Text('Add Address'),
+            SizedBox(height: 10,),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black38,width: 1),
+                borderRadius: BorderRadius.circular(10)
+              ),
+              child: TextField(
+                controller: addresscontroller,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Enter Address'
+                ),
+              ),
+            ),
+            SizedBox(height: 20,),
+            GestureDetector(
+              onTap: () async{
+                await SharedPrefHelper().saveUserAddress(addresscontroller.text);
+                Get.snackbar(
+                  "Success",
+                  "Address Added Successfully",
+                  snackPosition: SnackPosition.TOP,
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                  duration: const Duration(seconds: 2),
+                  margin: const EdgeInsets.all(12),
+                );
+                Navigator.pop(context);
+              },
+              child: Center(
+                child: Container(
+                  width: 100,
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Color(0xff008080),
+                    borderRadius: BorderRadius.circular(10),
+                    
+                  ),
+                  child: Center(
+                      child: Text(
+                        'Add',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    )
+  ));
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -303,93 +400,3 @@ class _DetailPageState extends State<DetailPage> {
     _razorpay.clear(); // Removes all listeners
   }
 }
-
-  // //for payment gateway integration
-
-  // Future<void> makepayment(String amount) async {
-  //   try {
-  //     //payment process
-
-  //     PaymentIntent paymentIntent = await createPaymentIntent(amount, 'INR');
-  //     await Stripe.instance
-  //         .initPaymentSheet(
-  //           paymentSheetParameters: SetupPaymentSheetParameters(
-  //             paymentIntentClientSecret: paymentIntent.clientSecret,
-  //             style: ThemeMode.dark,
-  //             merchantDisplayName: "kapil's FoodGo",
-  //           ),
-  //         )
-  //         .then((Value) {
-  //           // Handle successful payment sheet initialization
-  //         });
-  //     displayPaymentSheet(amount);
-  //   } catch (e, s) {
-  //     print('exception: $e $s');
-  //   }
-  // }
-
-  // displayPaymentSheet(String amount) async {
-  //   try {
-  //     await Stripe.instance
-  //         .presentPaymentSheet()
-  //         .then((value) async {
-  //           // Handle successful payment
-
-  //           showDialog(
-  //             context: context,
-  //             builder: (BuildContext context) {
-  //               return AlertDialog(
-  //                 title: Text("Payment Successful"),
-  //                 content: Text("Your payment of $amount was successful."),
-  //                 actions: [
-  //                   TextButton(
-  //                     onPressed: () {
-  //                       Navigator.of(context).pop();
-  //                     },
-  //                     child: Text("OK"),
-  //                   ),
-  //                 ],
-  //               );
-  //             },
-  //           );
-  //         })
-  //         .catchError((error) {
-  //           // Handle payment error
-  //           print('Error during payment: $error');
-  //         });
-  //   } on StripeException catch (e, s) {
-  //     print('exception: $e $s');
-  //     showDialog(
-  //       context: context,
-  //       builder: (_) => AlertDialog(content: Text("Payment cancelled")),
-  //     );
-  //   } catch (e, s) {
-  //     print('$e $s');
-  //   }
-  // }
-
-  // createPaymentIntent(String amount, String currency) async {
-  //   try {
-  //     // Create a payment intent
-
-  //     Map<String, dynamic> body = {
-  //       'amount': calculateAmount(amount) ,
-  //       'currency': currency,
-  //       'payment_method_types[]': 'card'
-  //     };
-  //     //call the api to create payment intent on server
-  //     var response=await http.post(
-  //       Uri.parse('https://your-server.com/create-payment-intent'),
-  //       headers: {
-  //         'Authorization': 'Bearer YOUR_SECRET_KEY',
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: body,
-  //     );
-  //     return jsonDecode(response.body);
-
-  //   } catch (err) {
-  //     print('exception: ${err.toString()}');
-  //     return null;
-  //   }
-  // }

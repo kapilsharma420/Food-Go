@@ -5,6 +5,7 @@ class SharedPrefHelper {
   static String userNameKey = 'USERNAMEKEY';
   static String userEmailKey = 'USEREMAILKEY';
   static String userImageKey = 'USERIMAGEKEY';
+  static String userAddressKey = 'USERADDRESSKEY';
 
   // ---------------- SAVE METHODS / set methods ----------------
   Future<bool> saveUserId(String userId) async {
@@ -27,6 +28,11 @@ class SharedPrefHelper {
     return prefs.setString(userImageKey, userImage);
   }
 
+  Future<bool> saveUserAddress(String userAddress) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString(userAddressKey, userAddress);
+  }
+
   // ---------------- GET METHODS ----------------
   Future<String?> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -46,6 +52,10 @@ class SharedPrefHelper {
   Future<String?> getUserImage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userImageKey);
+  }
+  Future<String?> getUserAddress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(userAddressKey);
   }
 
   // ---------------- REMOVE USER DATA ----------------
