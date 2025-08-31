@@ -245,5 +245,6 @@ class _WalletPageState extends State<WalletPage> {
 
   dispose() {
     _razorpay.clear();
+     super.dispose();
   }
 }

@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true, // better edge-to-edge rendering
         // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home:WalletPage()
+      home:BottomNav()
     );
   }
 }
