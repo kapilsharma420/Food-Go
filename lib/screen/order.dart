@@ -47,8 +47,8 @@ class _OrderPageState extends State<OrderPage> {
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, index) {
             DocumentSnapshot ds = snapshot.data.docs[index];
-            return Container( 
-              margin: EdgeInsets.only(left: 10, right: 10,bottom: 15),
+            return Container(
+              margin: EdgeInsets.only(left: 6, right: 6, bottom: 15),
               child: Material(
                 borderRadius: BorderRadius.circular(20),
                 elevation: 3,
@@ -63,8 +63,10 @@ class _OrderPageState extends State<OrderPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.location_on_outlined,
-                              color: AppWidget.primary_red_color()),
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: AppWidget.primary_red_color(),
+                          ),
                           SizedBox(width: 10),
                           Text(
                             ds['address'],
@@ -81,7 +83,7 @@ class _OrderPageState extends State<OrderPage> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset( 
+                            child: Image.asset(
                               ds['image'],
                               height: 120,
                               width: 120,
@@ -92,28 +94,36 @@ class _OrderPageState extends State<OrderPage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(ds["foodName"],
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  )),
+                              Text(
+                                ds["foodName"],
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               SizedBox(height: 5),
                               Row(
                                 children: [
-                                  Icon(Icons.list_outlined,
-                                      color: AppWidget.primary_red_color()),
+                                  Icon(
+                                    Icons.list_outlined,
+                                    color: AppWidget.primary_red_color(),
+                                  ),
                                   SizedBox(width: 10),
-                                  Text(ds['quantity'].toString(),
-                                      style:
-                                          AppWidget.bold_textfield_style()),
+                                  Text(
+                                    ds['quantity'].toString(),
+                                    style: AppWidget.bold_textfield_style(),
+                                  ),
                                   SizedBox(width: 30),
-                                  Icon(Icons.monetization_on_sharp,
-                                      color: AppWidget.primary_red_color()),
+                                  Icon(
+                                    Icons.monetization_on_sharp,
+                                    color: AppWidget.primary_red_color(),
+                                  ),
                                   SizedBox(width: 10),
-                                  Text('₹${ds['total_price']}',
-                                      style:
-                                          AppWidget.bold_textfield_style()),
+                                  Text(
+                                    '₹${ds['total_price']}',
+                                    style: AppWidget.bold_textfield_style(),
+                                  ),
                                 ],
                               ),
                               SizedBox(height: 5),
@@ -156,19 +166,20 @@ class _OrderPageState extends State<OrderPage> {
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30)),
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                  //  height: MediaQuery.of(context).size.height / 1.7,
-                    child: allorder()),
-                    
+                    //  height: MediaQuery.of(context).size.height / 1.7,
+                    child: allorder(),
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 60,)
+            SizedBox(height: 60),
           ],
         ),
       ),

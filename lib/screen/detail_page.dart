@@ -396,7 +396,8 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
+    
     _razorpay.clear(); // Removes all listeners
+    super.dispose();
   }
 }
