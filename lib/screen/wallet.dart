@@ -26,7 +26,9 @@ class _WalletPageState extends State<WalletPage> {
     QuerySnapshot querySnapshot = await Database().getUserWallet(email!);
     wallet = querySnapshot.docs[0]["Wallet"].toString();
 
+  if (mounted) {
     setState(() {});
+  }
   }
 
   Razorpay _razorpay = Razorpay();
