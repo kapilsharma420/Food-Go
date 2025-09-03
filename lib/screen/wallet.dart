@@ -142,10 +142,13 @@ class _WalletPageState extends State<WalletPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    "₹" + wallet.toString(),
-                                    style: AppWidget.bold_textfield_style(),
-                                  ),
+                                  wallet == null
+                                      ? CircularProgressIndicator(strokeWidth: 1.5,color: Colors.red,) // 🔹 loading dikhayega jab tak null hai
+                                      : Text(
+                                        "₹$wallet", // 🔹 data aane ke baad wallet balance show karega
+                                        style: AppWidget.bold_textfield_style(),
+                                      ),
+                             
                                 ],
                               ),
                             ],
@@ -245,6 +248,6 @@ class _WalletPageState extends State<WalletPage> {
 
   dispose() {
     _razorpay.clear();
-     super.dispose();
+    super.dispose();
   }
 }
