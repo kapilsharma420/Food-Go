@@ -25,7 +25,7 @@ class _DetailPageState extends State<DetailPage> {
   String? name, id, email;
   getthesharedprefrence() async {
     //local saved data ko get kerne k liye
-    name = await SharedPrefHelper().getUserEmail();
+    name = await SharedPrefHelper().getUserName();
     id = await SharedPrefHelper().getUserId();
     email = await SharedPrefHelper().getUserEmail();
     addresscontroller.text = await SharedPrefHelper().getUserAddress() ?? '';
@@ -236,7 +236,7 @@ class _DetailPageState extends State<DetailPage> {
                             "total_price": totalprice.toString(),
                             "foodName": widget.name,
                             "image": widget.image,
-                            "status": "pending",
+                            "status": "Pending",
                             "order_id": orderid,
                             "address": addresscontroller.text,
                           };

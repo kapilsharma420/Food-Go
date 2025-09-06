@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hot_bite/screen/login_page.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
 
@@ -38,21 +39,26 @@ class _OnboardingState extends State<Onboarding> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 30),
-            Container(
-              height: Get.height * 0.07, //for responsive height
-              width: Get.width * .7, //for responsive width
-              decoration: BoxDecoration(
-                color: Color(0xff8c592a),
-                border: Border.all(color: Colors.white, width: 2),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Center(
-                child: Text(
-                  'Get Started',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: () {
+                Get.to(() => LoginPage());
+              },
+              child: Container(
+                height: Get.height * 0.07, //for responsive height
+                width: Get.width * .7, //for responsive width
+                decoration: BoxDecoration(
+                  color: Color(0xff8c592a),
+                  border: Border.all(color: Colors.white, width: 2),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Center(
+                  child: Text(
+                    'Get Started',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

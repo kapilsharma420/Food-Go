@@ -46,35 +46,70 @@ class Database {
         .get();
   }
 
- Future updateUserWallet(String addAmount, String id) async {
-  DocumentSnapshot userDoc =
-      await FirebaseFirestore.instance.collection("users").doc(id).get();
+  Future updateUserWallet(String addAmount, String id) async {
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection("users").doc(id).get();
 
-  int currentWallet = int.tryParse(userDoc["Wallet"].toString()) ?? 0;
-  int newWallet = currentWallet + int.parse(addAmount);
+    int currentWallet = int.tryParse(userDoc["Wallet"].toString()) ?? 0;
+    int newWallet = currentWallet + int.parse(addAmount);
 
+    return await FirebaseFirestore.instance.collection("users").doc(id).update({
+      'Wallet': newWallet.toString(),
+    });
+  }
+
+  Future deductUserWallet(String amount, String id) async {
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection("users").doc(id).get();
+
+    int currentWallet = int.tryParse(userDoc["Wallet"].toString()) ?? 0;
+    int newWallet = currentWallet - int.parse(amount);
+
+    return await FirebaseFirestore.instance.collection("users").doc(id).update({
+      'Wallet': newWallet.toString(),
+    });
+  }
+
+  Future<DocumentSnapshot> getUserWalletById(String id) async {
+    return await FirebaseFirestore.instance.collection("users").doc(id).get();
+  }
+
+  Future<Stream<QuerySnapshot>> getAdminOrders() async {
+    return await FirebaseFirestore.instance
+        .collection("orders")
+        .where("status", isEqualTo: 'Pending')
+        .snapshots();
+  }
+
+    Future updateAdminOrder(String docid) async{ 
+    return await FirebaseFirestore.instance
+        .collection("orders")
+        .doc(docid)
+        .update({"status": "Delivered"});
+  }
+
+
+ Future updateUserOrder(String userId, String orderDocId) async {
   return await FirebaseFirestore.instance
-      .collection("users")
-      .doc(id)
-      .update({'Wallet': newWallet.toString()});
+      .collection("users")           // ✅ users collection
+      .doc(userId)                   // ✅ user document (t9610110y8)
+      .collection('orders')          // ✅ us user ka orders subcollection
+      .doc(orderDocId)               // ✅ order document (94M24BC005)
+      .update({'status': 'Delivered'});
 }
 
-Future deductUserWallet(String amount, String id) async {
-  DocumentSnapshot userDoc =
-      await FirebaseFirestore.instance.collection("users").doc(id).get();
 
-  int currentWallet = int.tryParse(userDoc["Wallet"].toString()) ?? 0;
-  int newWallet = currentWallet - int.parse(amount);
+  Future<Stream<QuerySnapshot>> getAllUsers() async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .snapshots();
+  }
 
-  return await FirebaseFirestore.instance
-      .collection("users")
-      .doc(id)
-      .update({'Wallet': newWallet.toString()});
-}
-
-Future<DocumentSnapshot> getUserWalletById(String id) async {
-  return await FirebaseFirestore.instance.collection("users").doc(id).get();
-}
-
+      Future deleteUser(String id) async{
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .delete( );
+  }
 
 }

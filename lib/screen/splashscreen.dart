@@ -41,7 +41,7 @@ class _SplashscreenState extends State<Splashscreen> {
             ),
             SizedBox(height: 20),
             Text(
-              'Welcome to Hot Bite',
+              "Welcome to Kapil's FoodGo",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
