@@ -1,57 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_bite/screen/login_page.dart';
+import 'package:hot_bite/service/share_pref.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
 
-class Onboarding extends StatefulWidget {
+class Onboarding extends StatelessWidget {
   const Onboarding({super.key});
 
-  @override
-  State<Onboarding> createState() => _OnboardingState();
-}
-
-class _OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.only(top: 50, left: 40, right: 20),
+        margin: const EdgeInsets.only(top: 50, left: 40, right: 20),
         child: Column(
           children: [
             lottie.Lottie.asset(
-              'images/pizza_animation.json', // Ensure this path matches your assets
+              'images/pizza_animation.json',
               width: 350,
               height: 350,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'The Fastest \n Food Delivery',
-              style:
-                  AppWidget.onboarding_heading_textstyle(), // Using the text style from AppWidget
+              style: AppWidget.onboarding_heading_textstyle(),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Craving something delicious?\n Order now and get it delivered to your doorstep in on time!',
               style: AppWidget.onboarding_simple_textstyle(),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             GestureDetector(
-              onTap: () {
-                Get.to(() => LoginPage());
+              onTap: () async {
+                // 🔹 Flag save karo — dobara onboarding nahi dikhegi
+                await SharedPrefHelper().saveOnboardingSeen(true);
+                Get.off(() => LoginPage());
               },
               child: Container(
-                height: Get.height * 0.07, //for responsive height
-                width: Get.width * .7, //for responsive width
+                height: Get.height * 0.07,
+                width: Get.width * .7,
                 decoration: BoxDecoration(
-                  color: Color(0xff8c592a),
+                  color: const Color(0xff8c592a),
                   border: Border.all(color: Colors.white, width: 2),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     'Get Started',
                     style: TextStyle(

@@ -6,8 +6,9 @@ class SharedPrefHelper {
   static String userEmailKey = 'USEREMAILKEY';
   static String userImageKey = 'USERIMAGEKEY';
   static String userAddressKey = 'USERADDRESSKEY';
+  static String onboardingSeenKey = 'ONBOARDINGSEENKEY'; // 🔹 New
 
-  // ---------------- SAVE METHODS / set methods ----------------
+  // ---------------- SAVE METHODS ----------------
   Future<bool> saveUserId(String userId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(userIdKey, userId);
@@ -33,6 +34,12 @@ class SharedPrefHelper {
     return prefs.setString(userAddressKey, userAddress);
   }
 
+  // 🔹 Onboarding flag save
+  Future<bool> saveOnboardingSeen(bool seen) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool(onboardingSeenKey, seen);
+  }
+
   // ---------------- GET METHODS ----------------
   Future<String?> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -53,14 +60,27 @@ class SharedPrefHelper {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userImageKey);
   }
+
   Future<String?> getUserAddress() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userAddressKey);
   }
 
+  // 🔹 Onboarding flag get
+  Future<bool?> getOnboardingSeen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(onboardingSeenKey);
+  }
+
   // ---------------- REMOVE USER DATA ----------------
+  // 🔹 prefs.clear() ki jagah individual remove — onboarding flag safe rahega
   Future<bool> clearUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.clear();
+    await prefs.remove(userIdKey);
+    await prefs.remove(userNameKey);
+    await prefs.remove(userEmailKey);
+    await prefs.remove(userImageKey);
+    await prefs.remove(userAddressKey);
+    return true;
   }
 }

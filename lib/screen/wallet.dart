@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hot_bite/service/daatabase.dart';
 import 'package:hot_bite/service/share_pref.dart';
 import 'package:hot_bite/service/widget_support.dart';
@@ -14,75 +13,84 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-  String? email, wallet, id;
-  getthesharedpref() async {
-    email = await SharedPrefHelper().getUserEmail();
-    id = await SharedPrefHelper().getUserId();
-    setState(() {});
-  }
+  String? id;
+  int selectedAmount = 0;
+  late Razorpay _razorpay;
 
-  getUserWallet() async {
-    await getthesharedpref();
-    QuerySnapshot querySnapshot = await Database().getUserWallet(email!);
-    wallet = querySnapshot.docs[0]["Wallet"].toString();
-
-  if (mounted) {
-    setState(() {});
-  }
-  }
-
-  Razorpay _razorpay = Razorpay();
-  int selectedAmount = 0; // Track which amount is selected
   var options = {
     'key': 'rzp_test_RB3FEePW83UaOV',
     'amount': 0,
     'currency': 'INR',
-    'name': "kapil's FoodGo",
-    'description': 'Delicious food delivered to your doorstep',
+    'name': "Kapil's FoodGo",
+    'description': 'Add money to wallet',
     'prefill': {'contact': '0000000000', 'email': 'test@razorpay.com'},
   };
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getUserWallet();
-    options['amount'] = 0 * 100; // paise me set
-
+    _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _loadId();
   }
 
-  // 🔹 Reusable function for amount box
-  Widget buildAmountBox(int amount) {
-    bool isSelected = selectedAmount == amount;
+  Future<void> _loadId() async {
+    // 🔹 Sirf ID load karo — wallet Stream se real-time aayega
+    id = await SharedPrefHelper().getUserId();
+    if (mounted) setState(() {});
+  }
 
+  // 🔹 ScaffoldMessenger use karo — Overlay crash nahi hoga
+  void _showMessage(String message, Color color) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600)),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  Widget _buildAmountBox(int amount) {
+    bool isSelected = selectedAmount == amount;
     return GestureDetector(
       onTap: () {
         setState(() {
           selectedAmount = amount;
-          options['amount'] = amount * 100; // Razorpay me paise me set
+          options['amount'] = amount * 100;
         });
       },
-      child: Container(
-        width: 100,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 95,
         height: 50,
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? Colors.red : Colors.grey,
+            color: isSelected ? Colors.red : Colors.grey.shade400,
             width: 2,
           ),
-          color: isSelected ? Colors.red[50] : Colors.white,
+          color: isSelected ? Colors.red.shade50 : Colors.white,
           borderRadius: BorderRadius.circular(20),
+          boxShadow: isSelected
+              ? [BoxShadow(color: Colors.red.shade100, blurRadius: 6)]
+              : [],
         ),
         child: Center(
           child: Text(
             '₹$amount',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.red : Colors.black,
+              color: isSelected ? Colors.red : Colors.black87,
             ),
           ),
         ),
@@ -95,62 +103,92 @@ class _WalletPageState extends State<WalletPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.only(top: 40),
+        margin: const EdgeInsets.only(top: 40),
         child: Column(
           children: [
             Text('Wallet', style: AppWidget.onboarding_heading_textstyle()),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+
+                    // 🔹 StreamBuilder — real-time wallet balance by ID
                     Container(
-                      margin: EdgeInsets.only(left: 20, right: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
                       child: Material(
                         elevation: 3,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
+                          width: double.infinity,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: Colors.white,
                           ),
-                          width: MediaQuery.of(context).size.width,
                           child: Row(
                             children: [
-                              Image.asset(
-                                'images/wallet.png',
-                                height: 80,
-                                width: 80,
-                                fit: BoxFit.cover,
-                              ),
-                              SizedBox(width: 50),
+                              Image.asset('images/wallet.png',
+                                  height: 80, width: 80, fit: BoxFit.cover),
+                              const SizedBox(width: 30),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Your Wallet',
                                     style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  wallet == null
-                                      ? CircularProgressIndicator(strokeWidth: 1.5,color: Colors.red,) // 🔹 loading dikhayega jab tak null hai
-                                      : Text(
-                                        "₹$wallet", // 🔹 data aane ke baad wallet balance show karega
-                                        style: AppWidget.bold_textfield_style(),
-                                      ),
-                             
+                                  const SizedBox(height: 6),
+                                  // 🔹 id null check — loading dikhao
+                                  id == null
+                                      ? const CircularProgressIndicator(
+                                          strokeWidth: 1.5, color: Colors.red)
+                                      : StreamBuilder<DocumentSnapshot>(
+                                          stream: Database()
+                                              .getWalletStream(id!),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const CircularProgressIndicator(
+                                                  strokeWidth: 1.5,
+                                                  color: Colors.red);
+                                            }
+                                            if (snapshot.hasError ||
+                                                !snapshot.hasData ||
+                                                !snapshot.data!.exists) {
+                                              return const Text('₹0',
+                                                  style: TextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.red));
+                                            }
+                                            // 🔹 Real-time balance — har update pe automatic refresh
+                                            String walletVal = snapshot
+                                                    .data!['Wallet']
+                                                    ?.toString() ??
+                                                '0';
+                                            return Text(
+                                              '₹$walletVal',
+                                              style: const TextStyle(
+                                                fontSize: 26,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                 ],
                               ),
                             ],
@@ -158,43 +196,70 @@ class _WalletPageState extends State<WalletPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
 
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          buildAmountBox(100),
-                          buildAmountBox(500),
-                          buildAmountBox(1000),
-                        ],
-                      ),
+                    const SizedBox(height: 30),
+
+                    // Amount selection boxes
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildAmountBox(100),
+                        _buildAmountBox(500),
+                        _buildAmountBox(1000),
+                      ],
                     ),
-                    SizedBox(height: 30),
+
+                    const SizedBox(height: 10),
+
+                    // 🔹 Agar koi amount select nahi to warning
+                    if (selectedAmount == 0)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text(
+                          'Please select an amount above',
+                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                        ),
+                      ),
+
+                    const SizedBox(height: 25),
+
+                    // Add Money button
                     GestureDetector(
                       onTap: () {
+                        // 🔹 Amount select karna zaroori
+                        if (selectedAmount == 0) {
+                          _showMessage(
+                              'Please select an amount first!', Colors.orange);
+                          return;
+                        }
+                        if (id == null) {
+                          _showMessage('User not found. Please login again.',
+                              Colors.red);
+                          return;
+                        }
                         _razorpay.open(options);
                       },
                       child: Container(
-                        margin: EdgeInsets.only(left: 20, right: 20),
-                        width: MediaQuery.of(context).size.width,
-                        height: 50,
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        width: double.infinity,
+                        height: 52,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          //
-                          border: Border.all(color: Colors.red, width: 1),
-                          color: AppWidget.primary_red_color(),
-                          // borderRadius: BorderRadius.circular(20),
+                          color: selectedAmount == 0
+                              ? Colors.grey.shade400 // disabled look
+                              : AppWidget.primary_red_color(),
                         ),
                         child: Center(
                           child: Text(
-                            'Add Money',
+                            selectedAmount == 0
+                                ? 'Select Amount First'
+                                : 'Add ₹$selectedAmount to Wallet',
                             style: AppWidget.white_text_field_style(),
                           ),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -206,49 +271,35 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    int amount = (options['amount'] as int) ~/ 100; // paise → ₹ convert
+    if (id == null) return;
+    int amount = (options['amount'] as int) ~/ 100;
 
-    await Database().updateUserWallet(amount.toString(), id!);
-
-    await getUserWallet(); // UI update
-    Get.snackbar(
-      "Success",
-      "₹$amount Added Successfully!",
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(12),
-    );
+    try {
+      // 🔹 ID se update — email ki zaroorat nahi
+      await Database().updateUserWallet(amount.toString(), id!);
+      // StreamBuilder khud refresh karega — manual setState nahi chahiye
+      setState(() {
+        selectedAmount = 0;
+        options['amount'] = 0;
+      });
+      _showMessage('₹$amount added to wallet!', Colors.green);
+    } catch (e) {
+      _showMessage('Payment done but wallet update failed. Contact support.',
+          Colors.orange);
+    }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    // Do something when payment fails
-    Get.snackbar(
-      "Error",
-      "Payment Failed!",
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(12),
-    );
+    _showMessage('Payment failed. Please try again.', Colors.red);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    // Do something when an external wallet was selected
-    Get.snackbar(
-      "Info",
-      "External Wallet Selected!",
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.blue,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 1),
-      margin: const EdgeInsets.all(12),
-    );
+    _showMessage('External wallet selected: ${response.walletName}',
+        Colors.blue);
   }
 
-  dispose() {
+  @override
+  void dispose() {
     _razorpay.clear();
     super.dispose();
   }

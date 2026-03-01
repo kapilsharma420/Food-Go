@@ -1,69 +1,103 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../screen/bottomnav.dart';
+import 'package:hot_bite/screen/bottomnav.dart';
+import 'package:hot_bite/service/daatabase.dart';
+import 'package:hot_bite/service/share_pref.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
   final emailFocus = FocusNode();
   final passwordFocus = FocusNode();
 
   var obscurePassword = true.obs;
+  var isLoading = false.obs;
+  var errorMessage = ''.obs;
 
   Future<void> loginWithFirebase() async {
     if (!formKey.currentState!.validate()) return;
 
-    // close keyboard
-    FocusScope.of(Get.context!).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+    errorMessage.value = '';
+    isLoading.value = true;
 
     try {
-      // Firebase login
+      // Step 1: Firebase Auth login
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // ✅ Success snackbar
-      Get.snackbar(
-        "Success",
-        "Login Successful!",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        duration: const Duration(seconds: 1),
-        margin: const EdgeInsets.all(12),
-      );
+      // Step 2: Firestore se user data fetch karo
+      var userSnapshot =
+          await Database().getUserWallet(emailController.text.trim());
 
-      // Navigate after short delay
-      Future.delayed(const Duration(milliseconds: 300), () {
-        Get.offAll(() => const BottomNav());
-      });
-
-    } on FirebaseAuthException catch (e) {
-      String errorMessage;
-      if (e.code == 'user-not-found') {
-        errorMessage = 'No user found for that email.';
-      } else if (e.code == 'wrong-password') {
-        errorMessage = 'Wrong password provided.';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'Invalid email address.';
-      } else {
-        errorMessage = e.message ?? 'Login failed.';
+      if (userSnapshot.docs.isEmpty) {
+        // Doc nahi milaa — kuch toh gadbad hai
+        await FirebaseAuth.instance.signOut();
+        isLoading.value = false;
+        errorMessage.value = 'Account not found. Please signup first.';
+        return;
       }
 
-      // ❌ Error snackbar
-      Get.snackbar(
-        "Error",
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(12),
-      );
+      var userData = userSnapshot.docs[0];
+      final Map<String, dynamic> userMap =
+          userData.data() as Map<String, dynamic>;
+
+      // Step 3: 🔹 isDisabled check — admin ne disable kiya hai kya
+      final bool isDisabled = userMap.containsKey('isDisabled')
+          ? (userMap['isDisabled'] ?? false)
+          : false;
+
+      if (isDisabled) {
+        await FirebaseAuth.instance.signOut();
+        isLoading.value = false;
+        errorMessage.value =
+            'Your account has been suspended. Please contact KAPIL SHARMA';
+        return;
+      }
+
+      // Step 4: SharedPref mein save karo
+      await Future.wait([
+        SharedPrefHelper()
+            .saveUserEmail(userMap['Email'] ?? emailController.text.trim()),
+        SharedPrefHelper().saveUserName(userMap['Name'] ?? ''),
+        SharedPrefHelper().saveUserId(userMap['Id'] ?? ''),
+      ]);
+
+      isLoading.value = false;
+      Get.offAll(() => const BottomNav());
+
+    } on FirebaseAuthException catch (e) {
+      isLoading.value = false;
+      errorMessage.value = _getErrorMessage(e.code);
+    } catch (e) {
+      isLoading.value = false;
+      errorMessage.value = 'Something went wrong. Please try again.';
+    }
+  }
+
+  String _getErrorMessage(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No account found with this email.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'invalid-credential':
+        return 'Invalid email or password. Please check and try again.';
+      case 'user-disabled':
+        return 'This account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'network-request-failed':
+        return 'No internet connection. Please try again.';
+      default:
+        return 'Login failed. Please try again.';
     }
   }
 
