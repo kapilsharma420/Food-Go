@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hot_bite/admin/homeAdminPage.dart';
 import 'package:hot_bite/screen/bottomnav.dart';
 import 'package:hot_bite/screen/login_page.dart';
 import 'package:hot_bite/screen/onboarding.dart';
@@ -25,24 +26,32 @@ class _SplashscreenState extends State<Splashscreen> {
   }
 
   Future<void> _navigate() async {
-    // Step 1: Onboarding check
-    bool onboardingSeen =
-        await SharedPrefHelper().getOnboardingSeen() ?? false;
+    final pref = SharedPrefHelper();
+
+    // 🔹 Step 1: Admin check — pehle
+    bool isAdminLoggedIn = await pref.getAdminLoggedIn();
+    if (isAdminLoggedIn) {
+      Get.off(() => const HomeAdminPage());
+      return;
+    }
+
+    // 🔹 Step 2: Onboarding check
+    bool onboardingSeen = await pref.getOnboardingSeen() ?? false;
     if (!onboardingSeen) {
       Get.off(() => const Onboarding());
       return;
     }
 
-    // Step 2: Firebase Auth check
+    // 🔹 Step 3: Firebase Auth check
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       Get.off(() => LoginPage());
       return;
     }
 
-    // Step 3: Firestore se isDisabled check
+    // 🔹 Step 4: isDisabled check
     try {
-      String? userId = await SharedPrefHelper().getUserId();
+      String? userId = await pref.getUserId();
 
       if (userId == null || userId.isEmpty) {
         await _forceLogout();
@@ -55,28 +64,21 @@ class _SplashscreenState extends State<Splashscreen> {
           .get();
 
       if (!userDoc.exists) {
-        // Doc hi nahi — force logout
         await _forceLogout();
         return;
       }
 
-      // 🔹 isDisabled check — field na ho toh false maano
       final Map<String, dynamic> userData =
           userDoc.data() as Map<String, dynamic>;
-      final bool isDisabled = userData.containsKey('isDisabled')
-          ? (userData['isDisabled'] ?? false)
-          : false;
+      final bool isDisabled = userData['isDisabled'] ?? false;
 
       if (isDisabled) {
-        // Admin ne disable kiya — force logout
         await _forceLogout();
         return;
       }
 
-      // Sab theek — home
       Get.off(() => const BottomNav());
     } catch (e) {
-      // Network issue — safe side pe home
       Get.off(() => const BottomNav());
     }
   }

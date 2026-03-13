@@ -4,12 +4,11 @@ import 'package:get/get.dart';
 import 'package:hot_bite/admin/allorder.dart';
 import 'package:hot_bite/admin/manage_users.dart';
 import 'package:hot_bite/screen/login_page.dart';
-import 'package:hot_bite/service/widget_support.dart';
+import 'package:hot_bite/service/share_pref.dart';
 
 class HomeAdminPage extends StatelessWidget {
   const HomeAdminPage({super.key});
 
-  // Logout confirm dialog
   Future<void> _confirmLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -19,28 +18,36 @@ class HomeAdminPage extends StatelessWidget {
           children: [
             Icon(Icons.logout, color: Colors.red),
             SizedBox(width: 8),
-            Text('Logout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Logout',
+                style:
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
-        content: const Text('Are you sure you want to logout from admin panel?'),
+        content:
+            const Text('Are you sure you want to logout from admin panel?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+            child: const Text('Logout',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
+      // 🔹 Admin flag clear karo — restart pe login page aayega
+      await SharedPrefHelper().clearAdminLoggedIn();
       Get.offAll(() => LoginPage());
     }
   }
@@ -54,7 +61,8 @@ class HomeAdminPage extends StatelessWidget {
           // ── Gradient Header ──
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(top: 55, bottom: 24, left: 20, right: 20),
+            padding: const EdgeInsets.only(
+                top: 55, bottom: 24, left: 20, right: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.red.shade600, Colors.red.shade900],
@@ -75,22 +83,19 @@ class HomeAdminPage extends StatelessWidget {
                     const Text(
                       'Admin Panel',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "Kapil's FoodGo",
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14),
                     ),
                   ],
                 ),
-                // Logout button
                 GestureDetector(
                   onTap: () => _confirmLogout(context),
                   child: Container(
@@ -99,7 +104,8 @@ class HomeAdminPage extends StatelessWidget {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.logout_rounded, color: Colors.white, size: 22),
+                    child: const Icon(Icons.logout_rounded,
+                        color: Colors.white, size: 22),
                   ),
                 ),
               ],
@@ -113,7 +119,6 @@ class HomeAdminPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Stats Row
                   Row(
                     children: [
                       Expanded(
@@ -147,7 +152,7 @@ class HomeAdminPage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _StatCard(
-                          label: 'Delivered Today',
+                          label: 'Delivered',
                           icon: Icons.check_circle_rounded,
                           color: Colors.green.shade600,
                           stream: FirebaseFirestore.instance
@@ -177,31 +182,34 @@ class HomeAdminPage extends StatelessWidget {
                   const Text(
                     'Management',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black54,
-                      letterSpacing: 0.4,
-                    ),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black54,
+                        letterSpacing: 0.4),
                   ),
                   const SizedBox(height: 14),
 
-                  // Manage Orders Card
                   _AdminMenuCard(
                     image: 'images/delivery-man.png',
                     title: 'Manage Orders',
                     subtitle: 'View & update pending orders',
-                    gradientColors: [Colors.orange.shade400, Colors.red.shade500],
+                    gradientColors: [
+                      Colors.orange.shade400,
+                      Colors.red.shade500
+                    ],
                     onTap: () => Get.to(() => const AllOrders()),
                   ),
 
                   const SizedBox(height: 16),
 
-                  // Manage Users Card
                   _AdminMenuCard(
                     image: 'images/team.png',
                     title: 'Manage Users',
                     subtitle: 'View & remove registered users',
-                    gradientColors: [Colors.blue.shade400, Colors.indigo.shade500],
+                    gradientColors: [
+                      Colors.blue.shade400,
+                      Colors.indigo.shade500
+                    ],
                     onTap: () => Get.to(() => const ManageUsers()),
                   ),
 
@@ -216,7 +224,6 @@ class HomeAdminPage extends StatelessWidget {
   }
 }
 
-// ── Stat Card Widget ──
 class _StatCard extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -259,22 +266,18 @@ class _StatCard extends StatelessWidget {
                 return Text(
                   snapshot.data ?? '...',
                   style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: color),
                 );
               },
             ),
             const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.black54,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -282,7 +285,6 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// ── Admin Menu Card Widget ──
 class _AdminMenuCard extends StatelessWidget {
   final String image;
   final String title;
@@ -306,7 +308,8 @@ class _AdminMenuCard extends StatelessWidget {
         elevation: 4,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradientColors,
@@ -323,29 +326,24 @@ class _AdminMenuCard extends StatelessWidget {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Image.asset(image, height: 70, width: 70, fit: BoxFit.cover),
+                child: Image.asset(image,
+                    height: 70, width: 70, fit: BoxFit.cover),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(title,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
-                        fontSize: 13,
-                      ),
-                    ),
+                    Text(subtitle,
+                        style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 13)),
                   ],
                 ),
               ),

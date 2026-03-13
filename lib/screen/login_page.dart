@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hot_bite/admin/admin_loin.dart';
+import 'package:hot_bite/admin/admin_login.dart';
 import 'package:hot_bite/controller/logincontroller.dart';
 import 'package:hot_bite/screen/forgotpassword.dart';
 import 'package:hot_bite/screen/signup.dart';

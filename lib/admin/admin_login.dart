@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_bite/admin/homeAdminPage.dart';
+import 'package:hot_bite/service/share_pref.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
 
@@ -57,18 +58,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         return;
       }
 
-      // Pehla (aur akela) admin doc check karo
       final adminData = snapshot.docs.first.data();
       final correctUsername = adminData["username"]?.toString().trim() ?? '';
       final correctPassword = adminData["password"]?.toString().trim() ?? '';
 
       if (usernameController.text.trim() == correctUsername &&
           passwordController.text.trim() == correctPassword) {
-        // ✅ Login success
+        // ✅ Login success — flag save karo restart ke liye
+        await SharedPrefHelper().saveAdminLoggedIn(true);
         setState(() => _isLoading = false);
-        Get.offAll(const HomeAdminPage());
+        Get.offAll(() => const HomeAdminPage());
       } else {
-        // ❌ Wrong credentials
         setState(() {
           _isLoading = false;
           _errorMessage = 'Invalid username or password.';
@@ -90,7 +90,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              /// Top Header with Back Button
               Stack(
                 children: [
                   Container(
@@ -121,8 +120,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       ],
                     ),
                   ),
-
-                  // 🔹 Back button — top left
                   Positioned(
                     top: 45,
                     left: 15,
@@ -133,11 +130,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.8),
                           shape: BoxShape.circle,
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black12,
                               blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -153,7 +150,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               ),
 
               const SizedBox(height: 5),
-
               const Text(
                 "Admin Login",
                 style: TextStyle(
@@ -169,14 +165,12 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               ),
               const SizedBox(height: 20),
 
-              /// Login Form
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      /// Username
                       TextFormField(
                         controller: usernameController,
                         focusNode: usernameFocus,
@@ -200,7 +194,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       ),
                       const SizedBox(height: 15),
 
-                      /// Password
                       TextFormField(
                         controller: passwordController,
                         focusNode: passwordFocus,
@@ -217,9 +210,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                   : Icons.visibility,
                             ),
                             onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
+                              setState(
+                                  () => _obscurePassword = !_obscurePassword);
                             },
                           ),
                           border: OutlineInputBorder(
@@ -236,7 +228,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
                       const SizedBox(height: 15),
 
-                      // 🔹 Error message — snackbar ki jagah yahan dikhega
                       if (_errorMessage.isNotEmpty)
                         Container(
                           width: double.infinity,
@@ -256,7 +247,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                 child: Text(
                                   _errorMessage,
                                   style: TextStyle(
-                                      color: Colors.red.shade700, fontSize: 13),
+                                      color: Colors.red.shade700,
+                                      fontSize: 13),
                                 ),
                               ),
                             ],
@@ -265,7 +257,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
                       const SizedBox(height: 15),
 
-                      /// Login Button
                       SizedBox(
                         width: double.infinity,
                         height: 50,
@@ -290,7 +281,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                                 ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
                     ],
                   ),

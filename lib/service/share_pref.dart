@@ -6,7 +6,8 @@ class SharedPrefHelper {
   static String userEmailKey = 'USEREMAILKEY';
   static String userImageKey = 'USERIMAGEKEY';
   static String userAddressKey = 'USERADDRESSKEY';
-  static String onboardingSeenKey = 'ONBOARDINGSEENKEY'; // 🔹 New
+  static String onboardingSeenKey = 'ONBOARDINGSEENKEY';
+  static String adminLoggedInKey = 'ADMINLOGGEDINKEY'; // 🔹 Admin flag
 
   // ---------------- SAVE METHODS ----------------
   Future<bool> saveUserId(String userId) async {
@@ -34,10 +35,25 @@ class SharedPrefHelper {
     return prefs.setString(userAddressKey, userAddress);
   }
 
-  // 🔹 Onboarding flag save
   Future<bool> saveOnboardingSeen(bool seen) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setBool(onboardingSeenKey, seen);
+  }
+
+  // 🔹 Admin login flag — save/get/clear
+  Future<bool> saveAdminLoggedIn(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool(adminLoggedInKey, value);
+  }
+
+  Future<bool> getAdminLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(adminLoggedInKey) ?? false;
+  }
+
+  Future<void> clearAdminLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(adminLoggedInKey);
   }
 
   // ---------------- GET METHODS ----------------
@@ -66,14 +82,12 @@ class SharedPrefHelper {
     return prefs.getString(userAddressKey);
   }
 
-  // 🔹 Onboarding flag get
   Future<bool?> getOnboardingSeen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool(onboardingSeenKey);
   }
 
-  // ---------------- REMOVE USER DATA ----------------
-  // 🔹 prefs.clear() ki jagah individual remove — onboarding flag safe rahega
+  // ---------------- CLEAR ----------------
   Future<bool> clearUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(userIdKey);
