@@ -23,11 +23,14 @@ class SignupController extends GetxController {
   var obscureConfirmPassword = true.obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
+  var isPrivacyAccepted = false.obs; // 🔹 Privacy policy checkbox
 
   void togglePassword() => obscurePassword.value = !obscurePassword.value;
   void toggleConfirmPassword() =>
       obscureConfirmPassword.value = !obscureConfirmPassword.value;
   void unfocusAll() => FocusManager.instance.primaryFocus?.unfocus();
+  void togglePrivacy() =>
+      isPrivacyAccepted.value = !isPrivacyAccepted.value; // 🔹
 
   Future<void> signupWithFirebase() async {
     if (!formKey.currentState!.validate()) return;
@@ -48,7 +51,7 @@ class SignupController extends GetxController {
         "Name": nameController.text.trim(),
         "Email": emailController.text.trim(),
         "Wallet": "0",
-        "isDisabled": false, // 🔹 Default — naya user active hoga
+        "isDisabled": false,
       };
 
       await Future.wait([
@@ -60,7 +63,6 @@ class SignupController extends GetxController {
 
       isLoading.value = false;
       Get.offAll(() => LoginPage());
-
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
       errorMessage.value = _getErrorMessage(e.code);

@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_bite/controller/signupcontroller.dart';
 import 'package:hot_bite/service/widget_support.dart';
 import 'package:lottie/lottie.dart' as lottie;
+import 'package:url_launcher/url_launcher.dart';
 import 'login_page.dart';
 
 class SignupPage extends StatelessWidget {
@@ -10,6 +12,17 @@ class SignupPage extends StatelessWidget {
 
   final SignupController controller =
       Get.put(SignupController(), permanent: false);
+
+  // 🔹 Privacy policy URL
+  static const String _privacyUrl =
+      'https://sites.google.com/view/foodgoprivacypolicy/home';
+
+  Future<void> _launchPrivacy() async {
+    final uri = Uri.parse(_privacyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,9 +183,61 @@ class SignupPage extends StatelessWidget {
                               },
                             )),
 
+                        const SizedBox(height: 25),
+
+                        // 🔹 Privacy Policy Checkbox
+                        Obx(() => Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: Checkbox(
+                                    value: controller.isPrivacyAccepted.value,
+                                    onChanged: (_) =>
+                                        controller.togglePrivacy(),
+                                    activeColor:
+                                        AppWidget.primary_red_color(),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(4)),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black54),
+                                      children: [
+                                        const TextSpan(
+                                            text: 'I agree to the '),
+                                        TextSpan(
+                                          text: 'Privacy Policy',
+                                          style: TextStyle(
+                                            color: AppWidget
+                                                .primary_red_color(),
+                                            fontWeight: FontWeight.bold,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = _launchPrivacy,
+                                        ),
+                                        const TextSpan(
+                                            text:
+                                                ' and consent to the collection and use of my personal data.'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )),
+
                         const SizedBox(height: 15),
 
-                        // 🔹 Error message — snackbar ki jagah yahan dikhega
+                        // Error message
                         Obx(() => controller.errorMessage.value.isEmpty
                             ? const SizedBox.shrink()
                             : Container(
@@ -204,27 +269,39 @@ class SignupPage extends StatelessWidget {
 
                         const SizedBox(height: 15),
 
-                        /// Signup Button
+                        // 🔹 Signup Button — checkbox check hone pe hi active
                         Obx(() => SizedBox(
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xffffefbf),
+                                  backgroundColor:
+                                      controller.isPrivacyAccepted.value
+                                          ? const Color(0xffffefbf)
+                                          : Colors.grey.shade300,
                                   foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
+                                      borderRadius:
+                                          BorderRadius.circular(15)),
                                 ),
-                                onPressed: controller.isLoading.value
+                                // 🔹 Checkbox checked + loading nahi = button active
+                                onPressed: controller.isLoading.value ||
+                                        !controller.isPrivacyAccepted.value
                                     ? null
                                     : controller.signupWithFirebase,
                                 child: controller.isLoading.value
                                     ? const CircularProgressIndicator(
                                         color: Colors.black, strokeWidth: 2.5)
-                                    : const Text("Sign Up",
+                                    : Text(
+                                        "Sign Up",
                                         style: TextStyle(
                                             fontSize: 18,
-                                            fontWeight: FontWeight.bold)),
+                                            fontWeight: FontWeight.bold,
+                                            color: controller
+                                                    .isPrivacyAccepted.value
+                                                ? Colors.black
+                                                : Colors.grey.shade500),
+                                      ),
                               ),
                             )),
                         const SizedBox(height: 15),
